@@ -22,21 +22,27 @@ const movies = [
 
 app.get('/v1/movies', (req, res) => {
     const { keyword, sort, page = 1, limit = 10 } = req.query
-    let filterdMovies = [...movies]
+    let filteredMovies = [...movies]
 
     if (keyword) {
-        filterdMovies = filterdMovies.filter((m) => m.title.toLowerCase().includes(keyword.toLowerCase())) || m.description.toLowerCase().includes(keyword.toLowerCase())
+        filteredMovies = filteredMovies.filter(
+            (m) =>
+                m.title.toLowerCase().includes(keyword.toLowerCase()) ||
+                m.description.toLowerCase().includes(keyword.toLowerCase()))
+
     }
+
     if (sort === 'rating') {
-        filterdMovies.sort((a, b) => a.averageRating - b.averageRating)
-    } else {
-        filterdMovies.sort((a, b) => b.averageRating - a.averageRating)
+        filteredMovies.sort((a, b) => a.averageRating - b.averageRating)
+    } else if (sort === '-rating') {
+        filteredMovies.sort((a, b) => b.averageRating - a.averageRating)
     }
+
     const startIndex = (parseInt(page) - 1) * parseInt(limit)
     const endIndex = startIndex + parseInt(limit)
-    const pageinatedMovies = filterdMovies.slice(startIndex, endIndex)
+    const paginatedMovies = filteredMovies.slice(startIndex, endIndex)
 
-    res.status(200).json(pageinatedMovies)
+    res.status(200).json(paginatedMovies)
 })
 
 app.get('/v1/movies/:id', (req, res) => {
@@ -122,22 +128,17 @@ app.post('/v1/movies/:id/reviews', (req, res) => {
         })
     }
     const { content, rating } = req.body
-
     if (!content || !rating || rating < 1 || rating > 5) {
-        return res.json({
-            message: "Content and rating are required. Rating must be between 1 and 5(inc.)"
-        })
+        return res.status(400).json({ message: "Content and rating are required. Rating should be between 1 and 5(inc.)" })
     }
     const newReview = {
         id: reviewId++,
         content,
         rating
     }
-
     movie.reviews.push(newReview)
-
     movie.averageRating =
-        +(movie.reviews.reduce((sum, cur) => sum + cur.rating, 0) / movie.reviews.length).toFixed(2)
+        +(movie.reviews.reduce((sum, current) => sum + current.rating, 0) / movie.reviews.length).toFixed(2)
 
     res.status(201).json(newReview)
 })
