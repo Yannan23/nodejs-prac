@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev": "nodemon index.js",
-    "debug": "node --inspect index.js"
+    "dev": "nodemon src/index.js",
+    "debug": "node --inspect src/index.js"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

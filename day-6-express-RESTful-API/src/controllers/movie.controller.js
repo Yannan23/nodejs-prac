@@ -1,8 +1,3 @@
-const express = require('express')
-const app = express()
-app.use(express.json())
-app.use(cors)
-
 let newMovieId = 2;
 let reviewId = 3
 
@@ -20,7 +15,7 @@ const movies = [
     }
 ]
 
-app.get('/v1/movies', (req, res) => {
+const getAllMovies = (req, res) => {
     const { keyword, sort, page = 1, limit = 10 } = req.query
     let filteredMovies = [...movies]
 
@@ -43,9 +38,9 @@ app.get('/v1/movies', (req, res) => {
     const paginatedMovies = filteredMovies.slice(startIndex, endIndex)
 
     res.status(200).json(paginatedMovies)
-})
+}
 
-app.get('/v1/movies/:id', (req, res) => {
+const getMovieById = (req, res) => {
     const movie = movies.find((m) => m.id === parseInt(req.params.id))
     if (!movie) {
         return res.status(404).json(
@@ -55,9 +50,9 @@ app.get('/v1/movies/:id', (req, res) => {
         )
     }
     res.status(200).json(movie)
-})
+}
 
-app.post('/v1/movies', (req, res) => {
+const addMovie = (req, res) => {
     const { title, description, types } = req.body
     if (!title || !description || !Array.isArray(types) || types.length === 0) {
         return res.status(400).json({
@@ -74,9 +69,9 @@ app.post('/v1/movies', (req, res) => {
     }
     movies.unshift(newMovie)
     res.status(201).json(newMovie)
-})
+}
 
-app.put('/v1/movies/:id', (req, res) => {
+const updateMovieById = (req, res) => {
     const movie = movies.find((m) => m.id === parseInt(req.params.id))
     if (!movie) {
         return res.status(404).json({ message: "Movie is not found" })
@@ -98,19 +93,18 @@ app.put('/v1/movies/:id', (req, res) => {
     }
 
     res.json(movie)
-})
+}
 
-
-app.delete('/v1/movies/:id', (req, res) => {
+const deleteMovieById = (req, res) => {
     const movieIndex = movies.findIndex((m) => m.id = parseInt(req.params.id))
     if (movieIndex === -1) {
         return res.status(404).json({ message: "Movie is not found" })
     }
     movies.splice(movieIndex, 1)
     res.sendStatus(204)
-})
+}
 
-app.get('/v1/movies/:id/reviews', (req, res) => {
+const getReviewsByMovieId = (req, res) => {
     const movie = movies.find((m) => m.id === parseInt(req.params.id))
     if (!movie || !movie.reviews || movie.reviews.length === 0) {
         return res.status(404).json({
@@ -118,9 +112,9 @@ app.get('/v1/movies/:id/reviews', (req, res) => {
         })
     }
     res.status(200).json(movie.reviews)
-})
+}
 
-app.post('/v1/movies/:id/reviews', (req, res) => {
+const addReviewByMovieId = (req, res) => {
     const movie = movies.find((m) => m.id === parseInt(req.params.id))
     if (!movie) {
         res.status(404).json({
@@ -141,16 +135,14 @@ app.post('/v1/movies/:id/reviews', (req, res) => {
         +(movie.reviews.reduce((sum, current) => sum + current.rating, 0) / movie.reviews.length).toFixed(2)
 
     res.status(201).json(newReview)
-})
+}
 
-app.listen(3000, () => {
-    console.log('Server is listening on port 3000');
-})
-
-function cors(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'content-type');
-
-    next()
+module.exports = {
+    getAllMovies,
+    getMovieById,
+    addMovie,
+    updateMovieById,
+    deleteMovieById,
+    getReviewsByMovieId,
+    addReviewByMovieId
 }
