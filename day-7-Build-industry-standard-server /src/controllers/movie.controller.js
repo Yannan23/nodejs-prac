@@ -46,17 +46,16 @@ const getAllMovies = (req, res) => {
     res.status(200).json(paginatedMovies)
 }
 
-const getMovieById = (req, res) => {
-    const movie = movies.find((m) => m.id === parseInt(req.params.id))
+const getMovieById = (req, res, next) => {
+    // const {id} = req.params;
+    const movie = movies.find((m) => m.id === parseInt(req.params.id));
     if (!movie) {
-        return res.status(404).json(
-            {
-                message: "Movie is not found"
-            }
-        )
+        return res.status(404).json({
+            message: 'Movie not found',
+        });
     }
-    res.status(200).json(movie)
-}
+    res.json(movie);
+};
 
 const addMovie = (req, res) => {
     const { title, description, types } = req.body
@@ -69,7 +68,7 @@ const addMovie = (req, res) => {
         id: newMovieId++,
         title,
         description,
-        types: [],
+        types,
         averageRating: 0,
         reviews: []
     }
@@ -79,6 +78,7 @@ const addMovie = (req, res) => {
 
 const updateMovieById = (req, res) => {
     const movie = movies.find((m) => m.id === parseInt(req.params.id))
+
     if (!movie) {
         return res.status(404).json({ message: "Movie is not found" })
     }
@@ -100,6 +100,8 @@ const updateMovieById = (req, res) => {
 
     res.json(movie)
 }
+
+
 
 const deleteMovieById = (req, res) => {
     const movieIndex = movies.findIndex((m) => m.id = parseInt(req.params.id))
