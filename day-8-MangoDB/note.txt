@@ -1,0 +1,54 @@
+
+ Terminology
+
+DB Server (数据库服务器)
+Database （数据库）一个server里可以有多个数据库，前期只有一个就够
+Collection（集合）（类似于SQL表）（同一个集合里存同一种类型数据）
+    users=》 user
+Document （文档）（类似于sql row）
+    {
+        "_id":Object('123'),
+        "name":"mason"
+    }
+field （字段）(指每个属性)
+
+Server- Client model
+app server，【 mongo shell， mongodb compass】=》Client
+
+postman是后端
+
+| create
+
+db.students.inserOne
+(current db -> school)
+(students -> collection name)
+(inserOne -> action)
+
+| read
+
+db.students.findOne()
+db.students.findMany().limit()
+        -projection
+        -countDocuments
+        - sort
+
+| update
+
+db.students.updateOne()
+db.students.updateMany()
+
+| delete
+
+db.students.deleteOne()
+db.students.deleteMany()
+
+show Collection
+
+db.students.drop() 删掉数据库
+
+
+数据不要出现重复
+
+｜｜   Index
+需要开辟新的一个空间， 一个字段开辟一个空间，额外占用时间
+当发一个请求很长时间不回来，可以考虑加索引
