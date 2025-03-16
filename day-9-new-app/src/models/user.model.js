@@ -1,13 +1,12 @@
 const { model, Schema } = require('mongoose')
-import mongoose from '../../node_modules/mongoose/types/index.d';
 
-const schema = new mongoose.Schema({
-    userName: {
-        type: string,
+const schema = new Schema({
+    username: {
+        type: String,
         required: true
     },
     password: {
-        type: string,
+        type: String,
         required: true
     }
 })

@@ -13,7 +13,7 @@ const optionalConfigs = {
 }
 
 const requiredConfigs = {
-    REQUIRED: process.env.REQUIRED
+    DB_CONNECTION_STRING: process.env.DB_CONNECTION_STRING
 }
 
 for (const key in requiredConfigs) {
