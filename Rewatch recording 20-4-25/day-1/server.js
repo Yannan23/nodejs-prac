@@ -7,7 +7,7 @@ homePage = fs.readFileSync(path.join(__dirname, 'home.html'))
 
 const logs = []
 const logFilePath = path.join(__dirname, 'logger.json')
-logger = fs.readFileSync(logFilePath, 'utf-8')
+logger = fs.readFile(logFilePath, 'utf-8')
 logs.push(...JSON.parse(logger))
 
 const server = http.createServer((req, res) => {
