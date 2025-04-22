@@ -1,8 +1,11 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
-app.use(express.json())
 
+app.use(express.json())
+app.use(cors())
 let nextMovieId = 2
+let reviewId = 3
 
 const movies = [
     {
@@ -21,31 +24,31 @@ const movies = [
 app.get('/v1/movies', (req, res) => {
     const { keyword, sort, limit = 10, page = 1 } = req.query
 
-    const filteredMovie = [...movies]
+    let filteredMovies = [...movies]
     if (keyword) {
-        filteredMovie = filteredMovie.filter(
+        filteredMovies = filteredMovies.filter(
             m => m.title.toLowerCase().includes(keyword.toLowerCase()) ||
                 m.description.toLowerCase().includes(keyword.toLowerCase())
         )
     }
     if (sort === 'rating') {
-        filteredMovie.sort((a, b) => a.averageRating - b.averageRating)
-    } else if (sort === -'rating') {
-        filteredMovie.sort((a, b) => b.averageRating - a.averageRating)
+        filteredMovies.sort((a, b) => a.averageRating - b.averageRating)
+    } else if (sort === '-rating') {
+        filteredMovies.sort((a, b) => b.averageRating - a.averageRating)
     }
 
-    const startIndex = parseInt(page - 1) * parseInt(limit)
+    const startIndex = (parseInt(page) - 1) * parseInt(limit)
     const endIndex = parseInt(limit) + startIndex
-    const pagedmovie = filteredMovie.slice(startIndex, endIndex)
+    const paginatedMovies = filteredMovies.slice(startIndex, endIndex)
 
-    res.status(200).json(pagedmovie)
+    res.status(200).json(paginatedMovies)
 })
 
 app.post('/v1/movies', (req, res, next) => {
     const { title, description, types } = req.body
     if (!title || !description || !Array.isArray(types) || types.length === 0) {
         return res.status(400).json({
-            msg: "Missing ...."
+            message: "Missing title, description, or types"
         })
     }
 
@@ -53,7 +56,9 @@ app.post('/v1/movies', (req, res, next) => {
         id: nextMovieId++,
         title,
         description,
-        types
+        types,
+        averageRating: 0,
+        reviews: []
     }
     movies.unshift(newMovie)
     res.status(201).json(newMovie)
@@ -65,10 +70,10 @@ app.get('/v1/movies/:id', (req, res, next) => {
     const movie = movies.find(movie => movie.id === +id)  //parseInt(id)
     if (!movie) {
         return res.status(404).json({
-            msg: "Movie not found"
+            message: "Movie not found"
         })
     }
-    res.status(200).json(movie)
+    res.json(movie)
 })
 
 app.put('/v1/movies/:id', (req, res, next) => {
@@ -76,7 +81,7 @@ app.put('/v1/movies/:id', (req, res, next) => {
     const movie = movies.find(movie => movie.id === +id)
     if (!movie) {
         return res.status(404).json({
-            msg: "Movie not found"
+            message: "Movie not found"
         })
     }
     const { title, description, types } = req.body
@@ -94,7 +99,7 @@ app.put('/v1/movies/:id', (req, res, next) => {
         }
         movie.types = types
     }
-    res.status(201).json(movie)
+    res.json(movie)
 })
 
 app.delete('/v1/movies/:id', (req, res, next) => {
@@ -114,16 +119,14 @@ app.post('/v1/movies/:id/reviews', (req, res, next) => {
     const movie = movies.find(movie => movie.id === +id)  //parseInt(id)
     if (!movie) {
         return res.status(404).json({
-            msg: "Movie not found"
+            message: "Movie not found"
         })
     }
 
-    const reviews = movie.reviews
-    let reviewId = movie.reviews.length + 1
-
     const { content, rating } = req.body
+
     if (!content || !rating || rating < 1 || rating > 5) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "Field cannot be blank"
         })
     }
@@ -132,9 +135,11 @@ app.post('/v1/movies/:id/reviews', (req, res, next) => {
         content,
         rating
     }
+    let reviews = movie.reviews
+
     reviews.push(review)
     movie.averageRating = +(movie.reviews.reduce((sum, current) => sum + current.rating, 0) / movie.reviews.length).toFixed(2)
-    res.status(201).json(reviews)
+    res.status(201).json(review)
 })
 
 app.get('/v1/movies/:id/reviews', (req, res, next) => {
@@ -142,12 +147,12 @@ app.get('/v1/movies/:id/reviews', (req, res, next) => {
     const movie = movies.find(movie => movie.id === +id)  //parseInt(id)
     if (!movie) {
         return res.status(404).json({
-            msg: "Movie not found"
+            message: "Movie not found"
         })
     }
 
-    const reviews = movie.reviews
-    res.status(200).json(reviews)
+    let reviews = movie.reviews
+    res.json(reviews)
 })
 
 app.listen(3000, () => {
