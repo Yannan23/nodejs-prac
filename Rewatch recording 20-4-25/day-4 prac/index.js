@@ -1,9 +1,11 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
+const movieRouter = express.Router()
 
 app.use(express.json())
 app.use(cors())
+app.use('/v1/movies', movieRouter)
 let nextMovieId = 2
 let reviewId = 3
 
@@ -21,7 +23,7 @@ const movies = [
     },
 ];
 
-app.get('/v1/movies', (req, res) => {
+movieRouter.get('/', (req, res) => {
     const { keyword, sort, limit = 10, page = 1 } = req.query
 
     let filteredMovies = [...movies]
@@ -44,7 +46,7 @@ app.get('/v1/movies', (req, res) => {
     res.status(200).json(paginatedMovies)
 })
 
-app.post('/v1/movies', (req, res, next) => {
+movieRouter.post('/', (req, res, next) => {
     const { title, description, types } = req.body
     if (!title || !description || !Array.isArray(types) || types.length === 0) {
         return res.status(400).json({
@@ -64,7 +66,7 @@ app.post('/v1/movies', (req, res, next) => {
     res.status(201).json(newMovie)
 })
 
-app.get('/v1/movies/:id', (req, res, next) => {
+movieRouter.get('/:id', (req, res, next) => {
     const { id } = req.params
     // const movie = movies.find(movie => movie.id.toString() === id)
     const movie = movies.find(movie => movie.id === +id)  //parseInt(id)
@@ -76,7 +78,7 @@ app.get('/v1/movies/:id', (req, res, next) => {
     res.json(movie)
 })
 
-app.put('/v1/movies/:id', (req, res, next) => {
+movieRouter.put('/:id', (req, res, next) => {
     const { id } = req.params
     const movie = movies.find(movie => movie.id === +id)
     if (!movie) {
@@ -102,7 +104,7 @@ app.put('/v1/movies/:id', (req, res, next) => {
     res.json(movie)
 })
 
-app.delete('/v1/movies/:id', (req, res, next) => {
+movieRouter.delete('/:id', (req, res, next) => {
     const { id } = req.params
     const movieIndex = movies.findIndex(m => m.id === +id)
     if (movieIndex === -1) {
@@ -114,7 +116,7 @@ app.delete('/v1/movies/:id', (req, res, next) => {
     res.sendStatus(204)
 })
 
-app.post('/v1/movies/:id/reviews', (req, res, next) => {
+movieRouter.post('/:id/reviews', (req, res, next) => {
     const { id } = req.params
     const movie = movies.find(movie => movie.id === +id)  //parseInt(id)
     if (!movie) {
@@ -142,7 +144,7 @@ app.post('/v1/movies/:id/reviews', (req, res, next) => {
     res.status(201).json(review)
 })
 
-app.get('/v1/movies/:id/reviews', (req, res, next) => {
+movieRouter.get('/:id/reviews', (req, res, next) => {
     const { id } = req.params
     const movie = movies.find(movie => movie.id === +id)  //parseInt(id)
     if (!movie) {
