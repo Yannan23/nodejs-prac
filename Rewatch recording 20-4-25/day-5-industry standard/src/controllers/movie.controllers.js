@@ -1,3 +1,7 @@
+const { createLogger } = require("../utils/logger");
+
+const logger = createLogger(__filename)
+
 let nextMovieId = 2
 let reviewId = 3
 
@@ -15,7 +19,37 @@ const movies = [
     },
 ];
 
+/**
+ * 
+ * @swagger
+ * /movies:
+ *   get:
+ *     summary: Get all movies
+ *     parameters:
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [rating, -rating]
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List of movies
+ */
+
 const getAllMovies = (req, res) => {
+    logger.info('Get all movies', { payload: { query: req.query } })
     const { keyword, sort, limit = 10, page = 1 } = req.query
 
     let filteredMovies = [...movies]
@@ -35,6 +69,7 @@ const getAllMovies = (req, res) => {
     const endIndex = parseInt(limit) + startIndex
     const paginatedMovies = filteredMovies.slice(startIndex, endIndex)
 
+    logger.debug('Movie returned successfully', { payload: { count: filteredMovies.length } })
     res.status(200).json(paginatedMovies)
 }
 
