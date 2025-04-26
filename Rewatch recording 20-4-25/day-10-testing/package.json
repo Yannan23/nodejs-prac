@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "serverless": "^4.14.1"
   }
 }
