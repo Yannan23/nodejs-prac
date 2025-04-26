@@ -1,8 +1,8 @@
 jest.mock('../src/utils/jwt')
 jest.mock('../src/utils/config', () => ({}))
 
-const authGuardMiddleware = require('../src/middleware/authGard.middleware');
-const { validateToken } = require('../src/utils/jwt');
+const authGuardMiddleware = require('../../src/middleware/authGard.middleware');
+const { validateToken } = require('../../src/utils/jwt');
 
 describe('auth guard middleware', () => {
     it('should return 401 when header is not defined', () => {
